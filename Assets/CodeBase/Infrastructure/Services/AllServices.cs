@@ -1,22 +1,25 @@
-﻿using CodeBase.Infrastructure.Factory;
-
-namespace CodeBase.Infrastructure.Services
+﻿namespace CodeBase.Infrastructure.Services
 {
-    public class AllServices
-    {
-        private static AllServices _instance;
-        public static AllServices Container =>
-            _instance ??= new AllServices();
+	public class AllServices
+	{
+		private static AllServices _instance;
 
-        public void RegisterSingle<TService>(TService implementation) where TService : IService => 
-            Implementation<TService>.ServiceInstance = implementation;
+		public static AllServices Container =>
+			_instance ??= new AllServices();
 
-        public TService Single<TService>() where TService : IService => 
-            Implementation<TService>.ServiceInstance;
+		public void RegisterSingle<TService>(TService implementation) where TService : IService
+		{
+			Implementation<TService>.ServiceInstance = implementation;
+		}
 
-        private static class Implementation<TService> where TService : IService
-        {
-            public static TService ServiceInstance;
-        }
-    }
+		public TService Single<TService>() where TService : IService
+		{
+			return Implementation<TService>.ServiceInstance;
+		}
+
+		private static class Implementation<TService> where TService : IService
+		{
+			public static TService ServiceInstance;
+		}
+	}
 }

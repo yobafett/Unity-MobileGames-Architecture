@@ -4,36 +4,41 @@ using CodeBase.Infrastructure.Services.SaveLoad;
 
 namespace CodeBase.Infrastructure.States
 {
-    public class LoadProgressState : IState
-    {
-        private readonly GameStateMachine _gameStateMachine;
-        private readonly IPersistentProgressService _progressService;
-        private readonly ISaveLoadService _saveLoadService;
+	public class LoadProgressState : IState
+	{
+		private readonly GameStateMachine _gameStateMachine;
+		private readonly IPersistentProgressService _progressService;
+		private readonly ISaveLoadService _saveLoadService;
 
-        public LoadProgressState(GameStateMachine gameStateMachine, IPersistentProgressService progressService, ISaveLoadService saveLoadService)
-        {
-            _gameStateMachine = gameStateMachine;
-            _progressService = progressService;
-            _saveLoadService = saveLoadService;
-        }
+		public LoadProgressState(GameStateMachine gameStateMachine, IPersistentProgressService progressService,
+			ISaveLoadService saveLoadService)
+		{
+			_gameStateMachine = gameStateMachine;
+			_progressService = progressService;
+			_saveLoadService = saveLoadService;
+		}
 
-        public void Enter()
-        {
-            LoadProgressOrInitNew();
-            
-            _gameStateMachine.Enter<LoadLevelState, string>(_progressService.Progress.WorldData.PositionOnLevel.Level);
-        }
+		public void Enter()
+		{
+			LoadProgressOrInitNew();
 
-        public void Exit()
-        {
-        }
+			_gameStateMachine.Enter<LoadLevelState, string>(_progressService.Progress.WorldData.PositionOnLevel.Level);
+		}
 
-        private void LoadProgressOrInitNew() =>
-            _progressService.Progress = 
-                _saveLoadService.LoadProgress() 
-                ?? NewProgress();
+		public void Exit()
+		{
+		}
 
-        private static PlayerProgress NewProgress() => 
-            new PlayerProgress(initialLevel: "Main");
-    }
+		private void LoadProgressOrInitNew()
+		{
+			_progressService.Progress =
+				_saveLoadService.LoadProgress()
+				?? NewProgress();
+		}
+
+		private static PlayerProgress NewProgress()
+		{
+			return new PlayerProgress("Main");
+		}
+	}
 }

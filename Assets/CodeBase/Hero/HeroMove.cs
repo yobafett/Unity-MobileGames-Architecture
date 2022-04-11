@@ -1,7 +1,4 @@
-using System;
-using CodeBase.CameraLogic;
 using CodeBase.Data;
-using CodeBase.Infrastructure;
 using CodeBase.Infrastructure.Services;
 using CodeBase.Infrastructure.Services.Inputs;
 using CodeBase.Infrastructure.Services.PersistentProgress;
@@ -10,60 +7,68 @@ using UnityEngine.SceneManagement;
 
 namespace CodeBase.Hero
 {
-    [RequireComponent(typeof(CharacterController))]
-    public class HeroMove : MonoBehaviour, ISavedProgress
-    {
-        public CharacterController CharacterController;
-        public float MovementSpeed;
-        
-        private IInputService _inputService;
-        private Camera _camera;
+	[RequireComponent(typeof(CharacterController))]
+	public class HeroMove : MonoBehaviour, ISavedProgress
+	{
+		public CharacterController CharacterController;
+		public float MovementSpeed;
+		private Camera _camera;
 
-        private void Awake() => 
-            _inputService = AllServices.Container.Single<IInputService>();
+		private IInputService _inputService;
 
-        private void Start() => 
-            _camera = Camera.main;
+		private void Awake()
+		{
+			_inputService = AllServices.Container.Single<IInputService>();
+		}
 
-        private void Update()
-        {
-            Vector3 movementVector = Vector3.zero;
-            
-            if (_inputService.Axis.sqrMagnitude > Constants.EPSILON)
-            {
-                movementVector = _camera.transform.TransformDirection(_inputService.Axis);
-                movementVector.y = 0f;
-                movementVector.Normalize();
+		private void Start()
+		{
+			_camera = Camera.main;
+		}
 
-                transform.forward = movementVector;
-            }
+		private void Update()
+		{
+			Vector3 movementVector = Vector3.zero;
 
-            movementVector += Physics.gravity;
-            
-            CharacterController.Move(MovementSpeed * movementVector * Time.deltaTime);
-        }
+			if (_inputService.Axis.sqrMagnitude > Constants.EPSILON)
+			{
+				movementVector = _camera.transform.TransformDirection(_inputService.Axis);
+				movementVector.y = 0f;
+				movementVector.Normalize();
 
-        public void LoadProgress(PlayerProgress progress)
-        {
-            if (CurrentLevel() == progress.WorldData.PositionOnLevel.Level)
-            {
-                Vector3Data savedPosition = progress.WorldData.PositionOnLevel.Position;
-                if (savedPosition != null) 
-                    Warp(to: savedPosition);
-            }
-        }
+				transform.forward = movementVector;
+			}
 
-        private void Warp(Vector3Data to)
-        {
-            CharacterController.enabled = false;
-            transform.position = to.AsUnityVector().AddY(CharacterController.height);
-            CharacterController.enabled = true;
-        }
+			movementVector += Physics.gravity;
 
-        public void UpdateProgress(PlayerProgress progress) => 
-            progress.WorldData.PositionOnLevel = new PositionOnLevel(CurrentLevel(), transform.position.AsVectorData());
+			CharacterController.Move(MovementSpeed * movementVector * Time.deltaTime);
+		}
 
-        private static string CurrentLevel() => 
-            SceneManager.GetActiveScene().name;
-    }
+		public void LoadProgress(PlayerProgress progress)
+		{
+			if (CurrentLevel() == progress.WorldData.PositionOnLevel.Level)
+			{
+				Vector3Data savedPosition = progress.WorldData.PositionOnLevel.Position;
+				if (savedPosition != null)
+					Warp(savedPosition);
+			}
+		}
+
+		public void UpdateProgress(PlayerProgress progress)
+		{
+			progress.WorldData.PositionOnLevel = new PositionOnLevel(CurrentLevel(), transform.position.AsVectorData());
+		}
+
+		private void Warp(Vector3Data to)
+		{
+			CharacterController.enabled = false;
+			transform.position = to.AsUnityVector().AddY(CharacterController.height);
+			CharacterController.enabled = true;
+		}
+
+		private static string CurrentLevel()
+		{
+			return SceneManager.GetActiveScene().name;
+		}
+	}
 }
