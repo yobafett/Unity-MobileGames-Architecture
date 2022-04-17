@@ -4,7 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
+  - PlayerAggro
+  - PlayerCollider
+  - AttackRangeDetector
+  - FxTemporaire
   - InitialPoint
+  - LoadingCurtain
   layers:
   - Default
   - TransparentFX
@@ -18,7 +23,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Player
   - 
   - 
   - 

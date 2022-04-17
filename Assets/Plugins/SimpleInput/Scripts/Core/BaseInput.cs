@@ -61,7 +61,6 @@ namespace SimpleInputNamespace
 				if( IsKeyValid() )
 					UnregisterInput();
 
-				ResetValue();
 				isTracking = false;
 			}
 		}
